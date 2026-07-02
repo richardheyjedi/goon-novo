@@ -6,9 +6,7 @@ export default function Footer({ waLink }) {
 
   return (
     <footer className="footer">
-      <svg className="logo" viewBox="0 0 122 28">
-        <use href="#goon" />
-      </svg>
+      <img src="https://i.ibb.co/YByNBDCy/BRANCO-05.png" alt="GOON Logo" className="logo" />
       <div>GLOBAL OR NOTHING</div>
       <div className="socials">
         <a href="https://instagram.com/goonglobal" target="_blank" rel="noopener noreferrer">
