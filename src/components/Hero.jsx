@@ -144,7 +144,7 @@ export default function Hero() {
           </div>
           <div className="bezel-content">
             <video
-              src="https://www.image2url.com/r2/default/videos/1782942730128-296c36bc-701a-4a76-ba19-4727c891e120.mp4"
+              src="https://www.image2url.com/r2/default/videos/1783021481338-15aacf64-4c25-45cb-b1e6-3d6269f579f4.mp4"
               autoPlay
               loop
               muted
