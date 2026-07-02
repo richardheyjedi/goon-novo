@@ -136,9 +136,9 @@ main{overflow:hidden}
 
 .hero-video-wrap {
   position: absolute;
-  right: 0;
+  right: -20%;
   top: 0;
-  width: 55%;
+  width: 80%;
   height: 100%;
   z-index: 1;
   pointer-events: none;
