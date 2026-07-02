@@ -9,7 +9,7 @@ export default function Footer({ waLink }) {
       <img src="https://i.ibb.co/YByNBDCy/BRANCO-05.png" alt="GOON Logo" className="logo" />
       <div>GLOBAL OR NOTHING</div>
       <div className="socials">
-        <a href="https://instagram.com/goonglobal" target="_blank" rel="noopener noreferrer">
+        <a href="https://www.instagram.com/goon.method/" target="_blank" rel="noopener noreferrer">
           Instagram
         </a>
       </div>
