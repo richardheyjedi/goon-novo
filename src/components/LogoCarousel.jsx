@@ -1,14 +1,12 @@
 import React from 'react';
 
-// Troque cada item por { name: 'Empresa', src: '/logos/empresa.svg' }.
-// Enquanto `src` estiver vazio, o carrossel exibe um placeholder de texto.
 const companies = [
-  { name: 'Sua marca 01', src: null },
-  { name: 'Sua marca 02', src: null },
-  { name: 'Sua marca 03', src: null },
-  { name: 'Sua marca 04', src: null },
-  { name: 'Sua marca 05', src: null },
-  { name: 'Sua marca 06', src: null },
+  { name: 'Empresa 02', src: '/logos/empresa-02.svg' },
+  { name: 'Empresa 03', src: '/logos/empresa-03.svg' },
+  { name: 'Empresa 04', src: '/logos/empresa-04.svg' },
+  { name: 'Empresa 05', src: '/logos/empresa-05.svg' },
+  { name: 'Empresa 06', src: '/logos/empresa-06.svg' },
+  { name: 'Empresa 07', src: '/logos/empresa-07.svg' },
 ];
 
 function LogoItem({ company }) {
