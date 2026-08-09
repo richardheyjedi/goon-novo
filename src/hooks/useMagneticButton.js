@@ -50,11 +50,11 @@ export function useMagneticButton(ref, range = 50, strength = 0.3) {
       });
     };
 
-    window.addEventListener('mousemove', onMouseMove);
+    element.addEventListener('pointermove', onMouseMove, { passive: true });
     element.addEventListener('mouseleave', onMouseLeave);
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
+      element.removeEventListener('pointermove', onMouseMove);
       element.removeEventListener('mouseleave', onMouseLeave);
     };
   }, [ref, range, strength]);

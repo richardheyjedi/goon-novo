@@ -4,7 +4,7 @@ import { useLanguage } from '../context/languageContext';
 import { useMagneticButton } from '../hooks/useMagneticButton';
 import { gsap } from '../lib/gsapConfig';
 
-export default function Contact({ waLink }) {
+export default function Contact() {
   const finalWaRef = useRef(null);
   const { t } = useLanguage();
 

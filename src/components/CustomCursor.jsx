@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { gsap } from '../lib/gsapConfig';
 
 /**
  * Custom dual-element cursor component that tracks the mouse with easing and scales
@@ -22,89 +21,60 @@ export default function CustomCursor() {
       return;
     }
 
-    const mouse = { x: 0, y: 0 };
-    const ringPos = { x: 0, y: 0 };
+    const mouse = { x: -40, y: -40 };
+    const ringPos = { x: -40, y: -40 };
+    let frameId = 0;
+
+    const tick = () => {
+      ringPos.x += (mouse.x - ringPos.x) * 0.18;
+      ringPos.y += (mouse.y - ringPos.y) * 0.18;
+      ring.style.transform = `translate3d(${ringPos.x}px, ${ringPos.y}px, 0) translate(-50%, -50%)`;
+      if (Math.abs(mouse.x - ringPos.x) > 0.2 || Math.abs(mouse.y - ringPos.y) > 0.2) {
+        frameId = requestAnimationFrame(tick);
+      } else {
+        frameId = 0;
+      }
+    };
 
     const onMouseMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
 
-      // Small internal dot moves instantly
-      gsap.to(dot, {
-        x: mouse.x,
-        y: mouse.y,
-        duration: 0.08,
-        ease: 'power2.out',
-      });
+      dot.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%)`;
+      if (!frameId) frameId = requestAnimationFrame(tick);
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-
-    // Smooth outer ring tracking using the GSAP ticker loop
-    const tick = () => {
-      ringPos.x += (mouse.x - ringPos.x) * 0.15;
-      ringPos.y += (mouse.y - ringPos.y) * 0.15;
-
-      gsap.set(ring, {
-        x: ringPos.x,
-        y: ringPos.y,
-      });
-    };
-
-    gsap.ticker.add(tick);
+    window.addEventListener('pointermove', onMouseMove, { passive: true });
 
     // Hover transformations
     const onMouseEnterInteractive = () => {
-      gsap.to(ring, {
-        scale: 1.8,
-        backgroundColor: 'rgba(199, 249, 0, 0.15)',
-        borderColor: '#C7F900',
-        duration: 0.3,
-      });
-      gsap.to(dot, {
-        scale: 0.6,
-        duration: 0.3,
-      });
+      ring.classList.add('is-interactive');
+      dot.classList.add('is-interactive');
     };
 
     const onMouseLeaveInteractive = () => {
-      gsap.to(ring, {
-        scale: 1,
-        backgroundColor: 'transparent',
-        borderColor: 'rgba(199, 249, 0, 0.5)',
-        duration: 0.3,
-      });
-      gsap.to(dot, {
-        scale: 1,
-        duration: 0.3,
-      });
+      ring.classList.remove('is-interactive');
+      dot.classList.remove('is-interactive');
     };
 
     // Attach listeners to generic selectors
-    const attachHoverEvents = () => {
-      const selectors = 'a, button, .btn, .magnet, .system, .card, .panel, .case, .contact-card';
-      document.querySelectorAll(selectors).forEach((elem) => {
-        elem.removeEventListener('mouseenter', onMouseEnterInteractive);
-        elem.removeEventListener('mouseleave', onMouseLeaveInteractive);
-        elem.addEventListener('mouseenter', onMouseEnterInteractive);
-        elem.addEventListener('mouseleave', onMouseLeaveInteractive);
-      });
+    const interactiveSelector = 'a, button, .btn, .magnet, .system, .card, .panel, .case, .contact-card';
+    const onPointerOver = (event) => {
+      if (event.target.closest(interactiveSelector)) onMouseEnterInteractive();
     };
-
-    // Track dynamic DOM mutations to attach elements loaded later
-    const observer = new MutationObserver(attachHoverEvents);
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    attachHoverEvents();
+    const onPointerOut = (event) => {
+      const from = event.target.closest(interactiveSelector);
+      const to = event.relatedTarget?.closest?.(interactiveSelector);
+      if (from && from !== to) onMouseLeaveInteractive();
+    };
+    document.addEventListener('pointerover', onPointerOver, { passive: true });
+    document.addEventListener('pointerout', onPointerOut, { passive: true });
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      gsap.ticker.remove(tick);
-      observer.disconnect();
-      document.querySelectorAll('a, button, .btn, .magnet').forEach((elem) => {
-        elem.removeEventListener('mouseenter', onMouseEnterInteractive);
-        elem.removeEventListener('mouseleave', onMouseLeaveInteractive);
-      });
+      window.removeEventListener('pointermove', onMouseMove);
+      document.removeEventListener('pointerover', onPointerOver);
+      document.removeEventListener('pointerout', onPointerOut);
+      cancelAnimationFrame(frameId);
     };
   }, []);
 
@@ -112,6 +82,7 @@ export default function CustomCursor() {
     <>
       <div
         ref={cursorDotRef}
+        className="cursor-dot"
         style={{
           position: 'fixed',
           top: 0,
@@ -128,6 +99,7 @@ export default function CustomCursor() {
       />
       <div
         ref={cursorRingRef}
+        className="cursor-ring"
         style={{
           position: 'fixed',
           top: 0,

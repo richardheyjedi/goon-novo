@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect } from 'react';
+import React, { useEffect, useRef, useLayoutEffect } from 'react';
 import { useTextReveal } from '../hooks/useTextReveal';
 import { useMagneticButton } from '../hooks/useMagneticButton';
 import { useParallax } from '../hooks/useParallax';
@@ -16,6 +16,7 @@ export default function Hero() {
   const orb1Ref = useRef(null);
   const orb2Ref = useRef(null);
   const videoWrapRef = useRef(null);
+  const videoRef = useRef(null);
   
   const { language, t } = useLanguage();
 
@@ -68,6 +69,45 @@ export default function Hero() {
   useParallax(orb2Ref, 120);
   useParallax(videoWrapRef, 60);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const shouldSkip = connection?.saveData || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (shouldSkip) return;
+
+    const loadVideo = () => {
+      if (!video.src) {
+        video.src = video.dataset.src;
+        video.load();
+        video.play().catch(() => {});
+      }
+    };
+    const idleId = 'requestIdleCallback' in window
+      ? window.requestIdleCallback(loadVideo, { timeout: 1800 })
+      : window.setTimeout(loadVideo, 1200);
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!video.src) return;
+      if (entry.isIntersecting && !document.hidden) video.play().catch(() => {});
+      else video.pause();
+    }, { threshold: 0.05 });
+    observer.observe(video);
+
+    const onVisibilityChange = () => {
+      if (document.hidden) video.pause();
+      else if (video.getBoundingClientRect().bottom > 0) video.play().catch(() => {});
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      if ('cancelIdleCallback' in window) window.cancelIdleCallback(idleId);
+      else clearTimeout(idleId);
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
+
   const titleText = t('hero.title') || "";
   const titleWords = titleText.split(' ');
 
@@ -82,13 +122,13 @@ export default function Hero() {
       <span className="tick t4"></span>
       
       <div className="hero-inner">
-        <img src="https://i.ibb.co/ycpNN8gb/LOGO-PNG.png" alt="GOON Logo" className="logo" />
+        <img src="/goon-logo-hero.png" alt="GOON Logo" className="logo" width="565" height="172" decoding="async" fetchPriority="high" />
         <div ref={subRef} className="sub">{t('hero.sub')}</div>
         <h1 ref={h1Ref} className="chrome">
           {titleWords.map((word, idx) => {
             let content = word;
             if (word.includes('[')) {
-              const match = word.match(/([^\[]*)\[(.*?)\](.*)/);
+              const match = word.match(/([^[]*)\[(.*?)\](.*)/);
               if (match) {
                 const leading = match[1] || "";
                 const markContent = match[2] || "";
@@ -144,11 +184,14 @@ export default function Hero() {
           </div>
           <div className="bezel-content">
             <video
-              src="https://www.image2url.com/r2/default/videos/1783021481338-15aacf64-4c25-45cb-b1e6-3d6269f579f4.mp4"
+              ref={videoRef}
+              data-src="https://www.image2url.com/r2/default/videos/1783021481338-15aacf64-4c25-45cb-b1e6-3d6269f579f4.mp4"
               autoPlay
               loop
               muted
               playsInline
+              preload="none"
+              aria-hidden="true"
             />
             <div className="hero-video-glow-orb" />
             <div className="video-glow-overlay" />

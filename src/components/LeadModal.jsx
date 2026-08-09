@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/languageContext';
+import { saveLead } from '../lib/leadStorage';
 
 export default function LeadModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,6 +8,7 @@ export default function LeadModal() {
   const [phone, setPhone] = useState('');
   const [revenue, setRevenue] = useState('');
   const [instagram, setInstagram] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -19,8 +21,10 @@ export default function LeadModal() {
     setIsOpen(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    await saveLead({ name: name.trim(), phone: phone.trim(), revenue: revenue.trim(), instagram: instagram.trim() });
     
     // Construct WhatsApp message template
     const template = t('leadForm.waTemplate');
@@ -42,6 +46,7 @@ export default function LeadModal() {
     setPhone('');
     setRevenue('');
     setInstagram('');
+    setIsSubmitting(false);
   };
 
   if (!isOpen) return null;
@@ -106,8 +111,8 @@ export default function LeadModal() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary lead-modal-submit">
-            {t('leadForm.submit')}
+          <button type="submit" className="btn btn-primary lead-modal-submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Salvando…' : t('leadForm.submit')}
           </button>
         </form>
       </div>

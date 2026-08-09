@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { gsap } from './lib/gsapConfig';
-import { useTextReveal } from './hooks/useTextReveal';
 import { useLanguage } from './context/languageContext';
 import CustomCursor from './components/CustomCursor';
 import Header from './components/Header';
@@ -11,6 +10,19 @@ import Stats from './components/Stats';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import LeadModal from './components/LeadModal';
+import LogoCarousel from './components/LogoCarousel';
+
+const AdminLeads = lazy(() => import('./components/AdminLeads'));
+
+function AdminRoute() {
+  const [active, setActive] = useState(() => window.location.hash === '#admin');
+  useEffect(() => {
+    const onHashChange = () => setActive(window.location.hash === '#admin');
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+  return active ? <Suspense fallback={null}><AdminLeads /></Suspense> : null;
+}
 
 // First Statement section with marker highlight sweep
 function StatementReveal() {
@@ -28,7 +40,7 @@ function StatementReveal() {
           mark.classList.add('revealed');
         }
       });
-      const trigger = gsap.to({}, {
+      gsap.to({}, {
         scrollTrigger: {
           trigger: mark,
           start: 'top 88%',
@@ -68,7 +80,7 @@ function SecondStatementReveal() {
           mark.classList.add('revealed');
         }
       });
-      const trigger = gsap.to({}, {
+      gsap.to({}, {
         scrollTrigger: {
           trigger: mark,
           start: 'top 88%',
@@ -96,11 +108,6 @@ export default function App() {
   const progressBarRef = useRef(null);
   const waFloatRef = useRef(null);
   const [showFloat, setShowFloat] = useState(false);
-  const { language, t } = useLanguage();
-
-  // Configuration for WhatsApp CTA link
-  const WHATSAPP_NUM = "5554994518000";
-  const waLink = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(t('contact.waMsg'))}`;
 
   // Page Scroll Progress Bar & Floating Bubble Listener
   useLayoutEffect(() => {
@@ -112,7 +119,7 @@ export default function App() {
 
     const ctx = gsap.context(() => {
       gsap.to(progressBar, {
-        width: '100%',
+        scaleX: 1,
         ease: 'none',
         scrollTrigger: {
           trigger: 'body',
@@ -128,11 +135,20 @@ export default function App() {
 
   // WhatsApp Floating Button Threshold Trigger
   useEffect(() => {
+    let frameId = 0;
     const handleScrollThreshold = () => {
-      setShowFloat(window.scrollY > 420);
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        setShowFloat(window.scrollY > 420);
+        frameId = 0;
+      });
     };
     window.addEventListener('scroll', handleScrollThreshold, { passive: true });
-    return () => window.removeEventListener('scroll', handleScrollThreshold);
+    handleScrollThreshold();
+    return () => {
+      window.removeEventListener('scroll', handleScrollThreshold);
+      cancelAnimationFrame(frameId);
+    };
   }, []);
 
   // Ambient mouse position tracking for spotlight and dotted highlight
@@ -145,34 +161,37 @@ export default function App() {
 
     const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const current = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let frameId = 0;
 
     const onMouseMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
+      if (!frameId) frameId = requestAnimationFrame(tick);
     };
 
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('pointermove', onMouseMove, { passive: true });
 
     const tick = () => {
       current.x += (mouse.x - current.x) * 0.08;
       current.y += (mouse.y - current.y) * 0.08;
 
       if (spot) {
-        gsap.set(spot, {
-          x: current.x,
-          y: current.y
-        });
+        spot.style.transform = `translate3d(${current.x}px, ${current.y}px, 0) translate(-50%, -50%)`;
       }
 
       root.style.setProperty('--mouse-x', `${current.x}px`);
       root.style.setProperty('--mouse-y', `${current.y}px`);
+
+      if (Math.abs(mouse.x - current.x) > 0.2 || Math.abs(mouse.y - current.y) > 0.2) {
+        frameId = requestAnimationFrame(tick);
+      } else {
+        frameId = 0;
+      }
     };
 
-    gsap.ticker.add(tick);
-
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      gsap.ticker.remove(tick);
+      window.removeEventListener('pointermove', onMouseMove);
+      cancelAnimationFrame(frameId);
     };
   }, []);
 
@@ -185,7 +204,10 @@ export default function App() {
           position: 'fixed',
           top: 0,
           left: 0,
-          width: '0%',
+          width: '100%',
+          transform: 'scaleX(0)',
+          transformOrigin: 'left center',
+          willChange: 'transform',
           height: '3px',
           backgroundColor: 'var(--signal)',
           zIndex: 99999,
@@ -234,6 +256,7 @@ export default function App() {
 
       {/* Lead capture modal form */}
       <LeadModal />
+      <AdminRoute />
 
       {/* Floating WhatsApp Bubble */}
       <a
@@ -253,11 +276,11 @@ export default function App() {
       </a>
 
       {/* Header section */}
-      <Header waLink={waLink} />
+      <Header />
 
       {/* Main sections container */}
       <main>
-        <Hero waLink={waLink} />
+        <Hero />
 
         {/* Marquee component */}
         <div className="marquee" aria-hidden="true">
@@ -281,6 +304,8 @@ export default function App() {
 
         <StatementReveal />
 
+        <LogoCarousel />
+
         <Timeline />
 
         <Ecosystem />
@@ -289,10 +314,10 @@ export default function App() {
 
         <SecondStatementReveal />
 
-        <Contact waLink={waLink} />
+        <Contact />
       </main>
 
-      <Footer waLink={waLink} />
+      <Footer />
     </>
   );
 }

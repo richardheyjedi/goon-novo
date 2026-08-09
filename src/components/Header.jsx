@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useMagneticButton } from '../hooks/useMagneticButton';
 import { useLanguage } from '../context/languageContext';
 
-export default function Header({ waLink }) {
+export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -12,35 +12,38 @@ export default function Header({ waLink }) {
   useMagneticButton(waBtnRef, 50, 0.25);
 
   useEffect(() => {
-    const sections = ['home', 'ecosystem', 'contact'];
+    const sectionElements = ['home', 'ecosystem', 'contact']
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    let frameId = 0;
     
     const handleScroll = () => {
-      let currentSection = 'home';
-      const scrollPosition = window.scrollY + 180; // Offset for header overlap
-
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            currentSection = section;
-          }
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        let currentSection = 'home';
+        const scrollPosition = window.scrollY + 180;
+        for (const element of sectionElements) {
+          if (element.offsetTop <= scrollPosition) currentSection = element.id;
         }
-      }
-      setActiveSection(currentSection);
-      setScrolled(window.scrollY > 40);
+        setActiveSection((current) => current === currentSection ? current : currentSection);
+        const nextScrolled = window.scrollY > 40;
+        setScrolled((current) => current === nextScrolled ? current : nextScrolled);
+        frameId = 0;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Run immediately on load
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(frameId);
+    };
   }, []);
 
   return (
     <header className={`top ${scrolled ? 'scrolled' : ''}`} id="top">
       <a href="#home" aria-label="GOON">
-        <img src="https://i.ibb.co/YByNBDCy/BRANCO-05.png" alt="GOON" className="logo" />
+        <img src="/goon-logo-white-512.png" alt="GOON" className="logo" width="512" height="512" decoding="async" fetchPriority="high" />
       </a>
       <nav id="nav" className={menuOpen ? 'open' : ''}>
         <a href="#home" className={activeSection === 'home' ? 'active' : ''} onClick={() => setMenuOpen(false)}>{t('nav.home') || 'Home'}</a>

@@ -117,5 +117,5 @@ export function useTextReveal(ref, options = {}) {
       ctx.revert();
       element.innerHTML = originalText;
     };
-  }, [ref, type, stagger, delay, y, blur, scrollTrigger, trigger]);
+  }, [ref, type, stagger, delay, y, blur, glow, scrollTrigger, trigger]);
 }
