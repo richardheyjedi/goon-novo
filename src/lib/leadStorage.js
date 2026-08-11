@@ -1,7 +1,5 @@
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const GOOGLE_SHEETS_WEBHOOK_URL = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL
-  || 'https://script.google.com/macros/s/AKfycbzks6oA7uxb_Z4VZqgWsOTcffIdfLlIBySlTSbx_gDrmj4Nbzh4pJGR76IsALa4JkaU/exec';
 const FALLBACK_KEY = 'goon_leads_fallback_v1';
 
 const isConfigured = Boolean(SUPABASE_URL && SUPABASE_KEY);
@@ -40,28 +38,6 @@ async function request(path, { method = 'GET', body, token } = {}) {
   return response.status === 204 ? null : response.json();
 }
 
-async function sendLeadToGoogleSheets(data) {
-  if (!GOOGLE_SHEETS_WEBHOOK_URL) return;
-
-  const createdAt = new Date().toISOString();
-
-  await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({
-      ...data,
-      nome: data.name,
-      telefone: data.phone,
-      faturamento: data.revenue,
-      created_at: createdAt,
-      data: createdAt,
-      timestamp: createdAt,
-      source: 'goon-novo',
-    }),
-  });
-}
-
 export async function getLeads(token) {
   return (await request('leads?select=id,created_at,name,phone,revenue,instagram&order=created_at.desc', { token })) || [];
 }
@@ -69,11 +45,6 @@ export async function getLeads(token) {
 export async function saveLead(data) {
   try {
     await request('leads', { method: 'POST', body: data });
-    try {
-      await sendLeadToGoogleSheets(data);
-    } catch (sheetsError) {
-      console.error('Lead salvo no Supabase, mas não enviado ao Google Sheets:', sheetsError.message);
-    }
     window.dispatchEvent(new CustomEvent('goon-leads-updated'));
     return { ...data, storedIn: 'supabase' };
   } catch (error) {
