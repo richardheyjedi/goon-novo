@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import './styles/index.css'
 import App from './App.jsx'
 import { LanguageProvider } from './context/languageContext'
+import { initializeAttribution } from './lib/attribution'
+
+initializeAttribution()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
