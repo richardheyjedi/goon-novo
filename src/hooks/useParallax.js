@@ -13,7 +13,8 @@ export function useParallax(ref, speed = 80) {
     if (!element) return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    const compactViewport = window.matchMedia('(max-width: 920px)').matches;
+    if (prefersReducedMotion || compactViewport) return;
 
     const ctx = gsap.context(() => {
       gsap.to(element, {

@@ -14,7 +14,11 @@ export function useMagneticButton(ref, range = 50, strength = 0.3) {
     if (!element) return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    const supportsHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (prefersReducedMotion || !supportsHover) return;
+
+    const xTo = gsap.quickTo(element, 'x', { duration: 0.3, ease: 'power2.out' });
+    const yTo = gsap.quickTo(element, 'y', { duration: 0.3, ease: 'power2.out' });
 
     const onMouseMove = (e) => {
       const rect = element.getBoundingClientRect();
@@ -25,29 +29,17 @@ export function useMagneticButton(ref, range = 50, strength = 0.3) {
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < range) {
-        gsap.to(element, {
-          x: dx * strength,
-          y: dy * strength,
-          duration: 0.3,
-          ease: 'power2.out',
-        });
+        xTo(dx * strength);
+        yTo(dy * strength);
       } else {
-        gsap.to(element, {
-          x: 0,
-          y: 0,
-          duration: 0.6,
-          ease: 'elastic.out(1, 0.4)',
-        });
+        xTo(0);
+        yTo(0);
       }
     };
 
     const onMouseLeave = () => {
-      gsap.to(element, {
-        x: 0,
-        y: 0,
-        duration: 0.6,
-        ease: 'elastic.out(1, 0.4)',
-      });
+      xTo(0);
+      yTo(0);
     };
 
     element.addEventListener('pointermove', onMouseMove, { passive: true });
@@ -56,6 +48,7 @@ export function useMagneticButton(ref, range = 50, strength = 0.3) {
     return () => {
       element.removeEventListener('pointermove', onMouseMove);
       element.removeEventListener('mouseleave', onMouseLeave);
+      gsap.killTweensOf(element);
     };
   }, [ref, range, strength]);
 }

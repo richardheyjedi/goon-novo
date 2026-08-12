@@ -40,12 +40,24 @@ export default function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event) => { if (event.key === 'Escape') setMenuOpen(false); };
+    const onResize = () => { if (window.innerWidth > 920) setMenuOpen(false); };
+    document.addEventListener('keydown', onKeyDown);
+    window.addEventListener('resize', onResize, { passive: true });
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [menuOpen]);
+
   return (
     <header className={`top ${scrolled ? 'scrolled' : ''}`} id="top">
       <a href="#home" aria-label="GOON">
         <img src="/goon-logo-white-512.png" alt="GOON" className="logo" width="512" height="512" decoding="async" fetchPriority="high" />
       </a>
-      <nav id="nav" className={menuOpen ? 'open' : ''}>
+      <nav id="nav" className={menuOpen ? 'open' : ''} aria-label="Navegação principal">
         <a href="#home" className={activeSection === 'home' ? 'active' : ''} onClick={() => setMenuOpen(false)}>{t('nav.home') || 'Home'}</a>
         <a href="#ecosystem" className={activeSection === 'ecosystem' ? 'active' : ''} onClick={() => setMenuOpen(false)}>{t('nav.ecosystem')}</a>
         <a href="#contact" className={activeSection === 'contact' ? 'active' : ''} onClick={() => setMenuOpen(false)}>{t('nav.contact')}</a>
@@ -84,6 +96,8 @@ export default function Header() {
           className={`burger ${menuOpen ? 'open' : ''}`}
           id="burger"
           aria-label="Menu"
+          aria-expanded={menuOpen}
+          aria-controls="nav"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span></span>

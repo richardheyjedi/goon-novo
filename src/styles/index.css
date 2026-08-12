@@ -14,7 +14,11 @@
 *{box-sizing:border-box} 
 html{scroll-behavior:smooth} 
 body{margin:0;background:var(--void);color:var(--ash);font-family:var(--text);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden} 
+html,body,#root{min-width:0;min-height:100%}
+img,video,svg{max-width:100%}
+button,input{font:inherit}
 a{color:inherit;text-decoration:none} 
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
 ::selection{background:var(--signal);color:var(--void)}
 
 /* Styling the logos to override inline fill attributes */
@@ -69,6 +73,7 @@ svg.logo{display:block}.gleam{display:block}
 .cursor-dot.is-interactive{scale:.6}.cursor-ring.is-interactive{scale:1.8;background-color:rgba(199,249,0,.15)!important;border-color:#C7F900!important}
 @media (hover:none){.spotlight,.bg-dots-hover{display:none}}
 @media (prefers-reduced-motion:reduce){.gleam,.bg-grid{animation:none}.spotlight{display:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 main,.top,.footer{position:relative;z-index:2}
 
 /* ---------- top nav ---------- */
@@ -807,7 +812,8 @@ main{overflow:hidden}
   transition: opacity .25s, transform .25s, visibility .25s;
   box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8);
 }
-.lang-switcher:hover .lang-dropdown {
+.lang-switcher:hover .lang-dropdown,
+.lang-switcher:focus-within .lang-dropdown {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -2080,6 +2086,9 @@ main{overflow:hidden}
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(199, 249, 0, 0.05);
   animation: modalScaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .lead-modal-close {
   position: absolute;
@@ -2147,6 +2156,35 @@ main{overflow:hidden}
 @keyframes modalScaleUp {
   from { opacity: 0; transform: scale(0.9) translateY(10px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.lead-modal-error{margin:0 0 12px;color:#ff7777;font-size:13px;text-align:center}
+
+@media (max-width:640px){
+  .top{padding:12px 16px}
+  .top>div{gap:10px!important}
+  .top .logo{width:66px}
+  .lang-btn{padding:8px 9px}
+  .hero{min-height:100svh;padding:112px 18px 64px}
+  .hero .logo{width:min(58vw,220px);margin-bottom:24px}
+  .hero .sub{font-size:10px;letter-spacing:.25em;margin-bottom:18px}
+  .hero h1{font-size:clamp(24px,8vw,36px)}
+  .hero p{font-size:16px;line-height:1.55;margin-top:24px}
+  .hero .actions,.final .actions{width:100%;flex-direction:column}
+  .hero .actions .btn,.final .actions .btn{width:100%}
+  .section{padding:72px 18px}
+  .section-head h2{font-size:clamp(32px,11vw,50px);overflow-wrap:anywhere}
+  .lead{font-size:16px}
+  .panel,.card,.eco,.office-card{padding:24px 20px}
+  .final{min-height:auto}
+  .final h2{font-size:clamp(42px,15vw,68px);overflow-wrap:anywhere}
+  .footer{padding-inline:18px}
+  .wa-float{right:16px;bottom:max(16px,env(safe-area-inset-bottom))}
+  .wa-float .btn-round{width:52px;height:52px}
+  .lead-modal-overlay{padding:12px;align-items:flex-end}
+  .lead-modal-content{max-height:calc(100dvh - 24px);padding:32px 20px 20px;border-radius:var(--r-lg) var(--r-lg) 0 0}
+  .lead-modal-content h3{font-size:21px;margin-bottom:22px;padding-inline:24px}
+  .lead-modal-field{margin-bottom:14px}
+  .lead-modal-input{font-size:16px}
 }
 
 /* ---------- local leads admin ---------- */
