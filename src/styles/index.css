@@ -708,7 +708,7 @@ main{overflow:hidden}
     z-index: 1;
   }
   .hero-video-wrap video {
-    opacity: 0.08;
+    opacity: 0.22;
   }
   .video-glow-overlay {
     background: radial-gradient(circle, transparent 20%, var(--void) 90%);
@@ -724,6 +724,7 @@ main{overflow:hidden}
   .footer-inner{grid-template-columns:1fr 1fr;gap:38px 48px}
   .footer-brand{grid-column:1/-1}
   .hero .frame{inset:76px 16px 16px}.t1{left:10px}.t2{right:10px}.t3{left:10px;bottom:10px}.t4{right:10px;bottom:10px}
+  .hero-word,.hero .sub>span,.hero p>span{opacity:1!important;transform:none!important;filter:none!important}
 }
 @media (max-width:640px){
   .systems,.method,.cases{grid-template-columns:1fr}
@@ -2161,7 +2162,8 @@ main{overflow:hidden}
 
 @media (max-width:640px){
   .top{padding:12px 16px}
-  .top>div{gap:10px!important}
+  .top>a,.top>div{flex:0 0 auto}
+  .top>div{gap:10px!important;margin-left:auto}
   .top .logo{width:66px}
   .lang-btn{padding:8px 9px}
   .hero{min-height:100svh;padding:112px 18px 64px}
@@ -2169,8 +2171,10 @@ main{overflow:hidden}
   .hero .sub{font-size:10px;letter-spacing:.25em;margin-bottom:18px}
   .hero h1{font-size:clamp(24px,8vw,36px)}
   .hero p{font-size:16px;line-height:1.55;margin-top:24px}
-  .hero .actions,.final .actions{width:100%;flex-direction:column}
-  .hero .actions .btn,.final .actions .btn{width:100%}
+  .hero .actions{width:100%;flex-flow:row nowrap;gap:8px}
+  .hero .actions .btn{flex:1 1 0;min-width:0;padding:12px 10px;font-size:10px;white-space:nowrap}
+  .final .actions{width:100%;flex-direction:column}
+  .final .actions .btn{width:100%}
   .section{padding:72px 18px}
   .section-head h2{font-size:clamp(32px,11vw,50px);overflow-wrap:anywhere}
   .lead{font-size:16px}
