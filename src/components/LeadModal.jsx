@@ -70,7 +70,7 @@ export default function LeadModal() {
       .replace('{revenue}', revenue)
       .replace('{instagram}', instagram);
 
-    const WHATSAPP_NUM = "5541998394841";
+    const WHATSAPP_NUM = "555491484194";
     const waUrl = `https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(formattedMsg)}`;
     
     // Redirect user to WhatsApp

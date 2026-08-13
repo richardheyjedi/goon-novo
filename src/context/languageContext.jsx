@@ -71,7 +71,7 @@ export const translations = {
       lead: "Do diagnóstico à implementação. Sem teatro. Sem apresentação esquecida na gaveta.",
       step: "ETAPA",
       step1: { title: "Position", desc: "Definimos o jogo: mercado, cliente, marca, diferenciação e plano de voo." },
-      step2: { title: "Builde", desc: "Construímos os ativos: produto, canais, processos, narrativas e sistemas." },
+      step2: { title: "Build", desc: "Construímos os ativos: produto, canais, processos, narrativas e sistemas." },
       step3: { title: "Operate", desc: "Entramos na operação com rituais, heads, KPIs e cadência executiva." },
       step4: { title: "Scale", desc: "Ajustamos rota, aceleramos vendas e preparamos a empresa para crescer." }
     },
